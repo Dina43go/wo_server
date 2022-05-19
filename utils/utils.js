@@ -18,7 +18,7 @@ exports.makeDate = () => {
 }
 
 /**
- * @description cette fonction vérifie si un tableau est vide ou pas !
+ * @description cette fonction retourne true si le tableau est vide 
  * @param {Array} array Of Objects
  * @returns bool
  */

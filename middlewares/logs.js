@@ -29,7 +29,9 @@ let errConnectionLog = (req) => {
     let fileName= ``;
 
     try {
-        fs.appendFileSync(path.resolve(__dirname , '..' , 'logs' , fileName) , logLine);
+        if(checkLogfolder()){
+            fs.appendFileSync(path.resolve(__dirname , '..' , 'logs' , fileName) , logLine);
+        }
     } catch (err) {
         console.log(err);
     }

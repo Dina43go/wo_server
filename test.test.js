@@ -1,4 +1,4 @@
 const colors = require('colors');
 
 
-console.log('for' , 'test'.yellow.italic.bold);
+console.log('test::' , 'true'.green.italic.bold);
