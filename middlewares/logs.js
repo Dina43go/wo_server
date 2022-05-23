@@ -4,6 +4,11 @@ let {v4} = require('uuid');
 const {makeDate , checkLogfolder} = require('../utils/utils');
 
 
+/**
+ * 
+ * @param {String} message text
+ * @param {String} fileName name of the file following by her extention .txt
+ */
 
 let logEvent = (message , fileName) => {
 
@@ -24,17 +29,4 @@ let requestLog = (req , res , next) => {
     next();
 }
 
-let errConnectionLog = (req) => {
-    let logLine = ``;
-    let fileName= ``;
-
-    try {
-        if(checkLogfolder()){
-            fs.appendFileSync(path.resolve(__dirname , '..' , 'logs' , fileName) , logLine);
-        }
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-module.exports = {requestLog};
+module.exports = {logEvent ,requestLog};

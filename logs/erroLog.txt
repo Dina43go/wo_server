@@ -1,0 +1,7 @@
+2022-5-21 12:16:57 	 228bdbc4-b35a-4579-b785-884af1dfad87 	 Error	Not allowed by cors 
+2022-5-21 12:57:5 	 4b708b04-e15f-4509-a464-5e0037cd7b7a 	 Error	Not allowed by cors 
+2022-5-21 13:2:39 	 2b74f984-5860-4720-b9b7-23f5aae0c37f 	 ReferenceError	path is not defined 
+2022-5-21 13:2:42 	 439c7202-920a-4674-a5c2-8bf0e51fe2ad 	 ReferenceError	path is not defined 
+2022-5-21 13:3:6 	 538c172e-49bf-4d0e-9cd5-866dd43294f3 	 ReferenceError	path is not defined 
+2022-5-21 13:3:8 	 8514f707-8f44-4171-8325-7a78444c3702 	 ReferenceError	path is not defined 
+2022-5-21 13:3:50 	 be29e2bd-f8fe-4b41-a9ec-92a655a3331c 	 ReferenceError	path is not defined 
