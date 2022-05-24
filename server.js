@@ -25,7 +25,7 @@ app.use(cookieParser());
 //Api route
 
 // routes
-app.use('/' , require('./routes/testRoute'));
+app.use('/login', require('./routes/api/loginRoute'));
 
 app.all('*' , require('./routes/404').error404);
 
