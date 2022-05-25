@@ -26,7 +26,17 @@ app.use(cookieParser());
 
 // routes
 app.use('/login', require('./routes/api/loginRoute'));
+app.use('/logout', require('./routes/api/logoutRoute'));
 
+app.use('/admin/dashboard-info',require('./routes/api/infoRoute'));
+app.use('/admin/hospitals', require('./routes/api/hospitalAdminRoute'));
+app.use('/hospital', require('./routes/api/hospitalRoute'));
+app.use('/hospital/emergency', require('./routes/api/emergencyRoute'));
+app.use('/hospital/position', require('./routes/api/positionRoute'));
+app.use('/hopital/doctors', require('./routes/api/doctorRoute'));
+app.use('/patient/:id', require('./routes/api/patientRoute'));
+app.use('/consultation', require('./routes/api/consultationRoute'));
+app.use('/antecedents', require('./routes/api/antecedentRoute'));
 app.all('*' , require('./routes/404').error404);
 
 // error handler
