@@ -27,6 +27,27 @@ exports.empty = (array) => {
 }
 
 /**
+ * 
+ * @param {Array} array 
+ * @returns boolean
+ */
+exports.affected = (array) => {
+    return array[0].affectedRows>0;
+}
+/**
+ * 
+ * @param {Object} data 
+ * @returns boolean
+ */
+exports.affected_ = (data) => {
+    return data.affectedRows>0;
+}
+
+exports.formatName = (name)=>{
+    return name.slice(0,1).toUpperCase()+ name.slice(1);
+}
+
+/**
  * @description cette fonction vérifie l'existance d'un répertoir log et la crée si elle n'exite pas
  * @returns bool retourne fale en cas d'erreur
  */

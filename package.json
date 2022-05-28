@@ -4,6 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "node test.test.js",
+    "db_test": "node config/db",
     "start": "node server.js",
     "serve": "nodemon server.js"
   },
@@ -25,7 +26,9 @@
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.4",
     "mysql2": "^2.3.3",
+    "nodemailer": "^6.7.5",
     "socket.io": "^4.4.1",
+    "uniqid": "^5.4.0",
     "uuid": "^8.3.2"
   },
   "description": ""

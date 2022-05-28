@@ -26,6 +26,7 @@ app.use(cookieParser());
 
 // routes
 app.use('/login', require('./routes/api/loginRoute'));
+app.use('/login-single' , require('./routes/api/loginSingleRoute'))
 app.use('/logout', require('./routes/api/logoutRoute'));
 
 app.use('/admin/dashboard-info',require('./routes/api/infoRoute'));

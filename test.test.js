@@ -1,9 +1,5 @@
-const colors = require('colors');
+const uniqid = require('uniqid');
 
-let arr2 = [1,2,5,8,7];
-let arr = [2,3];
+let name = "luc";
 
-let result = arr.map(u => arr2.includes(u));
-
-console.log(result);
-console.log('test::' , 'true'.green.italic.bold);
+console.log(name.slice(0,1).toUpperCase()+ name.slice(1));
