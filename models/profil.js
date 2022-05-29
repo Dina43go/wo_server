@@ -1,4 +1,4 @@
-const db = require("../config/db")
+const db = require("../config/db");
 
 class Profile {
     constructor(
@@ -42,14 +42,45 @@ class Profile {
                 adresse,
                 fatherTel,
                 motherTel,
+                userId_fk,
                 createdAt
             ) values ("${this.id}","${this.lastName}",${firstName1},"${this.firstName2}",${tel},${profession},
                         "${this.sex}","${this.nationality}","${this.birthday}","${this.adresse}",${fatherTel},
-                        ${motherTel}, CURRENT_TIMESTAMP())
+                        ${motherTel}, "${this.userId_fk}" , CURRENT_TIMESTAMP())
         `;
 
         const [result,_] = await db.query(sql);
         return result;
+    }
+
+    static async initAntecedents(id , {
+        allergy_fk,
+        chirurgico_fk,
+        familial_fk,
+        gynecho_fk,
+        medico_fk,
+        addiction_fk,
+        advanced_health_fk
+    }) {
+        const sql=`
+            update profiles set
+                    allergy_fk = "${allergy_fk}",
+                    chirurgico_fk = "${chirurgico_fk}",
+                    familial_fk= "${familial_fk}",
+                    gynecho_fk = "${gynecho_fk}",
+                    medico_fk= "${medico_fk}",
+                    addiction_fk="${addiction_fk}",
+                    advanced_health_fk="${advanced_health_fk}"
+            where profileId = "${id}"
+        `;
+        const [data,_] = await db.query(sql);
+        return data;
+    }
+
+    static async byIdfk(id){
+        const sql = `select * from profiles where userId_fk="${id}"`;
+        const [data,_] = await db.query(sql);
+        return data;
     }
 }
 

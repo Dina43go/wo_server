@@ -17,6 +17,11 @@ exports.makeDate = () => {
     return currentDatetime.getFullYear() + "-" + (currentDatetime.getMonth() + 1) + "-" + currentDatetime.getDate() + " " + currentDatetime.getHours() + ":" + currentDatetime.getMinutes() + ":" + currentDatetime.getSeconds();
 }
 
+exports.timeTampsToDate = (str) => {
+    let currentDatetime = new Date(str);
+    return currentDatetime.getDate() + "/" + (currentDatetime.getMonth() + 1) + "/" + currentDatetime.getFullYear() + " "   + currentDatetime.getHours() + ":" + currentDatetime.getMinutes();
+}
+
 /**
  * @description cette fonction retourne true si le tableau est vide 
  * @param {Array} array Of Objects

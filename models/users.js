@@ -10,6 +10,7 @@ class Users {
 
     async save(){
         const mail = this.mail !=""? `\"${this.mail}\"` : null;
+        const password = this.password !=""? `\"${this.password}\"` : null;
         const sql = `
             insert into 
             users(
@@ -19,7 +20,7 @@ class Users {
                 password,
                 create_at
             ) 
-            values ("${this.id}" , ${this.usergroup} , ${mail}, "${this.password}", CURRENT_TIMESTAMP());
+            values ("${this.id}" , ${this.usergroup} , ${mail}, ${password}, CURRENT_TIMESTAMP());
         `;
         let [data,_] = await db.query(sql);
         return data;
@@ -70,6 +71,16 @@ class Users {
         const sql = `
             UPDATE users
                 set refresh_token= "${token}"
+            where userId = "${id}"
+        `;
+        let data = db.query(sql);
+        return data;
+    };
+
+    static async setPassword(id , hash) {
+        const sql = `
+            UPDATE users
+                set password= "${hash}"
             where userId = "${id}"
         `;
         let data = db.query(sql);

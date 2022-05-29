@@ -35,8 +35,8 @@ app.use('/hospital', require('./routes/api/hospitalRoute'));
 app.use('/hospital/emergency', require('./routes/api/emergencyRoute'));
 app.use('/hospital/position', require('./routes/api/positionRoute'));
 app.use('/hopital/doctors', require('./routes/api/doctorRoute'));
-app.use('/patient/:id', require('./routes/api/patientRoute'));
-app.use('/consultation', require('./routes/api/consultationRoute'));
+app.use('/patient', require('./routes/api/patientRoute'));
+
 app.use('/antecedents', require('./routes/api/antecedentRoute'));
 app.all('*' , require('./routes/404').error404);
 

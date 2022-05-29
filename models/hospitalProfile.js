@@ -30,8 +30,8 @@ class HospitalProfile {
         return data;
     }
 
-    static async All() {
-        const sql = `select * from hopital_profil `;
+    static async byId(id) {
+        const sql = `select * from hopital_profil where user_userId="${id}"`;
         const [data,_] = await db.execute(sql);
         return data;
     }

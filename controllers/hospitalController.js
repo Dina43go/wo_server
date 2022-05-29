@@ -1,22 +1,76 @@
 const uniqid = require('uniqid');
 const bcrypt =require('bcrypt');
 const utils = require('../utils/utils');
+const db_utils = require('../utils/db');
+
+const {rolesState} = require('../config/roles');
+let mailer = require('../config/email');
+
 const Emergency = require('../models/emergency');
 const Position = require('../models/position');
 const DataShape = require('../models/shape');
 const Users = require('../models/users');
-const {rolesState} = require('../config/roles');
 const Profile = require('../models/profil');
+const HospitalProfile = require('../models/hospitalProfile');
 
-const hospital = (req ,res ,next) => {
-    res.status(200).send({msg : "profil de l'hopital"});
+const Allergy = require('../models/antecedents/allergy');
+const Chirurgical = require('../models/antecedents/chirurgical');
+const Familial = require('../models/antecedents/familial');
+const Gynecho = require('../models/antecedents/gynecho');
+const Medical = require('../models/antecedents/medical');
+const Blood = require('../models/antecedents/blood');
+const Addict = require('../models/antecedents/addict');
+
+
+const hospitalProfilInfo = async (req ,res ,next) => {
+    const data = await HospitalProfile.byId(req.params.id);
+    if(!utils.empty(data))
+        return res.status(200).json(DataShape.hospitalInfo(data));
+
+    res.status(200).json(data);
+}
+
+const updatePassword = async (req ,res ,next) => {
+    const body = req.body;
+    if(body.id =="" || body.oldPasseword=="" || body.newPasseword =="")
+        return res.status(401).json({err:"certaines informations sont manquantes"});
+
+    const userInfo = await Users.byId(body.id);
+    if(utils.empty(userInfo)) return res.status(403).json({err:"ce identifiant n'existe pas"});
+
+    const match = await bcrypt.compare(body.oldPasseword , userInfo[0].password);
+    if(match){
+        try {
+            const hash = await bcrypt.hash(body.newPasseword , 10);
+            Users.setPassword(body.id , hash);
+
+            const text = `
+                <h3> Wo service Félicitation ! votre mot de passe a été changé avec succès </h3>
+                le nouveau mot de passe d'authentification est : <strong>${body.newPasseword}</strong>
+            `;
+            
+            mailer.transporter.sendMail(mailer.mailOption(userInfo[0].mail , text) , (err , info)=> {
+                if(err){
+                    console.log(err);
+                    return res.status(500).json({err:"un problème est survenue veillez réessayer plus tard"});
+                } else
+                    return res.status(200).json({msg:"mot de passe changé avec success"});
+            });
+
+        } catch (err) {
+            res.status(500).json({err:"quelque chose s'est produit"});
+        }
+    } else res.status(403).json({err : "le mot de passe fourni est incorrecte"});
+    
 }
 
 const emergency = async (req ,res ,next) => {
     try {
-        const [data] = await Emergency.byId(req.params.id);
-        const squeletom = DataShape.emergency(data);
-        res.status(200).json(squeletom);
+        let data = await Emergency.byId(req.params.id);
+        if(!utils.empty(data))
+            return res.status(200).json(DataShape.emergency(data));
+
+        res.status(200).json(data);
     } catch (err) {
         console.log(err);
         res.status(500).json({err:"un problème est survenu"});
@@ -61,14 +115,14 @@ const position = async (req ,res ,next) => {
     } else return res.status(403).json({err:"un problème est survenu"});
 }
 const doctors = (req ,res) => {
-    res.status(200).send({msg : "doctor"});
+    res.status(200).json({msg : "doctor"});
 }
 
 const postDoctor = async (req ,res) => {
 
     const doctor = req.body;
     if(doctor.lastName =="" || doctor.firstName2 =="" || doctor.profession =="" || doctor.naissanceId =="" || doctor.email == "" || doctor.tel == "")
-        return res.status(401).json({err: "veiller renplir tous les champs"});
+        return res.status(401).json({err: "veiller remplir tous les champs"});
 
     const userfound = await Users.byEmail(doctor.email);
 
@@ -76,29 +130,56 @@ const postDoctor = async (req ,res) => {
     
     // build password
     const password = uniqid().toUpperCase().slice(5);
-    const text = `
-        <h3> Wo service Félicitation Docteur ${doctor.lastName.toUpperCase()} ${doctor.firstName1 !="" ? doctor.firstName1[0].toUpperCase()+"." : "" } ${utils.formatName(doctor.firstName2)} ! votre compte a été crée avec succès </h3>
-        votre mot de passe d'authentification est : <strong>${password}</strong>
-        <p>vous pouvez toute fois le changer plus tard </p>
-    `;
-
     try {
         const saltPassword = await bcrypt.hash(password , 10);
         const user = new Users(doctor.naissanceId , doctor.email , saltPassword , rolesState.doctor);
         
-        const profile = new Profile(uniqid(),doctor.lastName,doctor.firstName1,doctor.firstName2,
+        const identifiant = uniqid();
+        const profile = new Profile(identifiant,doctor.lastName,doctor.firstName1,doctor.firstName2,
                         doctor.tel,doctor.profession, doctor.sex,doctor.nationality,doctor.birthDay,
                         doctor.adresse,doctor.fatherTel,doctor.motherTel,doctor.naissanceId);
         
         // save data
         user.save();
         profile.save();
+
         // handle init of antecedents
+
+        const ids = {
+            allergy_fk: uniqid(),
+            chirurgico_fk: uniqid(),
+            familial_fk: uniqid(),
+            gynecho_fk: uniqid(),
+            medico_fk: uniqid(),
+            addiction_fk: uniqid(),
+            advanced_health_fk:uniqid()
+        }
+        Profile.initAntecedents(identifiant ,ids);
+        // dispose all antecedents table datas
+        Allergy.dispose(ids);
+        Addict.dispose(ids);
+        Chirurgical.dispose(ids);
+        Familial.dispose(ids)
+        Gynecho.dispose(ids)
+        Medical.dispose(ids);
+        Blood.dispose(ids);
         
+        const text = `
+            <h3> Wo service Félicitation Docteur ${doctor.lastName.toUpperCase()} ${doctor.firstName1 !="" ? doctor.firstName1[0].toUpperCase()+"." : "" } ${utils.formatName(doctor.firstName2)} ! votre compte a été crée avec succès </h3>
+            votre mot de passe d'authentification est : <strong>${password}</strong>
+            <p>vous pouvez toute fois le changer plus tard </p>
+        `;
+        mailer.transporter.sendMail(mailer.mailOption(doctor.email , text) , (err , info)=> {
+            if(err){
+                console.log(err);
+                return res.status(500).json({err:"un problème est survenue veillez réessayer plus tard"});
+            } else
+                return res.status(200).json({msg: "données enregistrées"});
+        });
+
     } catch (err) {
-        
+        res.status(500).send({err : "un problème est survenue"});
     }
-    res.status(200).send({msg : "doctor"});
 }
 
-module.exports = {hospital , emergency , setEmergency , position, doctors , postDoctor};
+module.exports = {hospitalProfilInfo ,updatePassword , emergency , setEmergency , position, doctors , postDoctor};

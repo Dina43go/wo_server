@@ -1,5 +1,3 @@
-const uniqid = require('uniqid');
+const arr = "paracetamol 1 comp£-£pQuinine 100";
 
-let name = "luc";
-
-console.log(name.slice(0,1).toUpperCase()+ name.slice(1));
+console.log(arr.split("£-£p"));
