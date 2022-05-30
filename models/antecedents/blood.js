@@ -14,18 +14,18 @@ class Blood {
         return data;
     }
 
-    static async set(id , blood_groupe , rh , electrophorese) {
+    static async set(id , bloodGroupe , rh , electrophorese) {
         const sql = `
             update advanced_health_information
             set
-                blood_groupe="${blood_groupe}",
+                blood_groupe="${bloodGroupe}",
                 rh="${rh}",
                 electrophorese_hemoglobin="${electrophorese}",
                 updateAt=CURRENT_TIMESTAMP()
-            where id= ${id}
+            where id= "${id}"
         `;
 
-        const [data,_] = db.query(sql);
+        const [data,_] = await db.query(sql);
         return data;
     }
 }

@@ -1,4 +1,5 @@
 const db = require("../../config/db");
+const { conformer } = require("../../utils/db");
 
 class Familial {
     static tag ="familial_fk";

@@ -1,4 +1,5 @@
 const db = require("../../config/db");
+const { conformer } = require("../../utils/db");
 
 class Medical {
     static tag ="medico_fk";
