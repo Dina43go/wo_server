@@ -13,18 +13,16 @@ exports.handleRefreshToken = async (req ,res , next) => {
     if(!cookies?.jwt) return res.sendStatus(401);
     
     //seclectionne un utilisateur qui poccède ce token
-
     let user = await Users.getToken(cookies.jwt);
-    
     if(empty(user)) return res.sendStatus(403);
 
     user = extractObject(user);
 
     jwt.verify(user.refresh_token , process.env.API_REFRESH_TOKEN , (err ,decoded)=>{
-        console.log(decoded);
+        // console.log("refresh",decoded);
         if(err || decoded.user.id !== user.userId) res.sendStatus(403);
 
-        const accessToken = jwt.sign({user: decoded.user} , process.env.API_REFRESH_TOKEN, {expiresIn : '60s'});
+        const accessToken = jwt.sign({user: decoded.user} , process.env.API_ACCESS_TOKEN, {expiresIn : '60s'});
         res.status(200).json({accessToken});
     });   
 }

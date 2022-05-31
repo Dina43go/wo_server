@@ -7,7 +7,7 @@ const hospitalAdminController = require('../../controllers/hospitalAdminControll
 const code = require('../../config/roles').roleCode;
 const checkRoles = require('../../middlewares/checkRoles');
 
-router.get('/' , checkRoles(code.admin) , hospitalAdminController.getAllHospital)
+router.get('/' , hospitalAdminController.getAllHospital)
       .post('/',hospitalAdminController.addHospital);
 
 router.get('/:id',hospitalAdminController.getHospital);

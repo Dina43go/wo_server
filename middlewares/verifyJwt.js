@@ -13,10 +13,14 @@ let checkJWT = (req , res , next) =>{
     const token = authorization.split(' ')[1];
     
     jwt.verify(token , process.env.API_ACCESS_TOKEN ,(err , decoded) => {
-        
-        if(err) return res.sendStatus(403);
+        // console.log("verify ::" ,decoded);
+        if(err) {
+            // console.log(err);
+            return res.sendStatus(403);
+        }
         req.userid = decoded.user.id;
-        req.group = [decoded.user.group.designation];
+        req.profileId = decoded.user.profileId;
+        req.group = [decoded.user.group];
         next();
     });
 }

@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 let Users = require('../models/users');
 let utils = require('../utils/utils');
 let db = require('../config/db');
+const Profile = require('../models/profil');
+const { extractObject } = require('../utils/db');
+const HospitalProfile = require('../models/hospitalProfile');
 const login = async (req ,res) => {
     // get data from request {email , pasword}
     let R = {
@@ -21,19 +24,29 @@ const login = async (req ,res) => {
     if(result) {
         try {
             let [userGroup , _] = await db.execute(`select designation , description from usergroup where userGroupId=${donnees[0].userGroupId_fk};`);
+            let profile = await Profile.byIdfk(donnees[0].userId);
             // on cree les tokens
+            let pros = false;
+            if(utils.empty(profile)) {
+                pros = true;
+                profile = await HospitalProfile.byId(donnees[0].userId);
+            }
+            
+            profile = extractObject(profile);
 
             const assecceTocken= jwt.sign({
                 user: {
                     id: donnees[0].userId,
-                    group: userGroup[0]
+                    profileId: profile.profileId,
+                    group: userGroup[0].designation
                 }
-            }, process.env.API_ACCESS_TOKEN , {expiresIn: '59s'});
+            }, process.env.API_ACCESS_TOKEN , {expiresIn: '60s'});
     
             const refreshTocken= jwt.sign({
                 user: {
                     id: donnees[0].userId,
-                    group: userGroup[0]
+                    profileId: profile.profileId,
+                    group: userGroup[0].designation
                 }
             }, process.env.API_REFRESH_TOKEN , {expiresIn: '1d'});
 
@@ -41,6 +54,10 @@ const login = async (req ,res) => {
             await Users.setToken( donnees[0].userId , refreshTocken);
             
             res.cookie('jwt', refreshTocken , {httpOnly: true, maxAge: 24*60*60*1000});
+            if(pros){
+                res.cookie('doctorNumber',[],{httpOnly: true, maxAge: 24*60*60*1000});
+            }
+                
             res.status(200).json({token : assecceTocken});
 
         } catch (err) {
@@ -57,25 +74,31 @@ const loginSingle = async (req,res)=> {
     if(req.body.id == "") 
         return res.status(401).json({err: "ce champ ne peut pas être vide"});
     
-    let user = await Users.byId(req.body.id);
+    let donnees = await Users.byId(req.body.id);
 
-    if(!utils.empty(user)) {
-        let [userGroup , _] = await db.execute(`select designation , description from usergroup where userGroupId=${user[0].userGroupId_fk};`);
+    if(!utils.empty(donnees)) {
+        let [userGroup , _] = await db.execute(`select designation , description from usergroup where userGroupId=${donnees[0].userGroupId_fk};`);
+        let profile = await Profile.byIdfk(donnees[0].userId);
+        // on cree les tokens
+        profile = extractObject(profile);
+
         const assecceTocken= jwt.sign({
             user: {
-                id: user[0].userId,
-                group: userGroup[0]
+                id: donnees[0].userId,
+                profileId: profile.profileId,
+                group: userGroup[0].designation
             }
-        }, process.env.API_ACCESS_TOKEN , {expiresIn: '59s'});
+        }, process.env.API_ACCESS_TOKEN , {expiresIn: '60s'});
 
         const refreshTocken= jwt.sign({
             user: {
-                id: user[0].userId,
-                group: userGroup[0]
+                id: donnees[0].userId,
+                profileId: profile.profileId,
+                group: userGroup[0].designation
             }
         }, process.env.API_REFRESH_TOKEN , {expiresIn: '1d'});
 
-        let data = await Users.setToken( user[0].userId , refreshTocken);
+        let data = await Users.setToken( donnees[0].userId , refreshTocken);
                 
         if(utils.affected(data)){
             res.cookie('jwt', refreshTocken , {httpOnly: true, maxAge: 24*60*60*1000});

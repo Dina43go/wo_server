@@ -25,9 +25,12 @@ const db = require('../config/db');
 
 const hospitalProfilInfo = async (req ,res ,next) => {
     const data = await HospitalProfile.byId(req.params.id);
-    
+    // console.log(req.cookies.doctorNumber);
     if(!utils.empty(data))
-        return res.status(200).json(DataShape.hospitalInfo(data));
+        return res.status(200).json({
+            doctorNumber: req.cookies.doctorNumber,
+            info : DataShape.hospitalInfo(data)
+        });
 
     res.status(200).json(data);
 }
@@ -141,20 +144,39 @@ const doctorsLogin = async (req,res)=> {
     if(result) {
         try {
             const data = await Profile.byIdfk(donnees[0].userId);
-            // const assecceTocken= jwt.sign({
-            //     doctor: {
-            //         id: donnees[0].userId,
-            //         group: userGroup[0]
-            //     }
-            // }, process.env.API_ACCESS_TOKEN , {expiresIn: '120s'});
+            // req.doctorNumber++;
+            const doctor = {
+                id: data[0].profileId,
+                lastName: data[0].lastName,
+                lastName: {
+                    1:data[0].firstName1,
+                    2:data[0].firstName2,
+                },
+                email: R.email,
+                profession: data[0].profession
+            }
+            req.cookies.doctorNumber.push(doctor);
+            console.log(req.cookies.doctorNumber);
+            res.cookie('doctorNumber',req.cookies.doctorNumber,{httpOnly: true, maxAge: 24*60*60*1000});
+            res.status(200).json(doctor);
             
-            // res.status(200).json({token : assecceTocken});
         } catch (err) {
             res.status(500).json({err:"problème interne"});
         }
 
     } else res.status(403).json({err: "le mot de passe forni est incorrecte"});
 }
+
+const doctorsLogout = async (req, res) =>{
+    const cookies = req.cookies;
+    if(cookies?.doctorNumber) {
+        const restofDoctors = cookies.doctorNumber.filter(data=> data.id != req.body.deconnexion);
+        res.cookie('doctorNumber',restofDoctors,{httpOnly: true, maxAge: 24*60*60*1000});
+    }
+    res.status(200).send("log out");
+}
+
+
 
 const postDoctor = async (req ,res) => {
 
@@ -220,4 +242,4 @@ const postDoctor = async (req ,res) => {
     }
 }
 
-module.exports = {hospitalProfilInfo ,updatePassword , emergency , setEmergency , position, doctors , postDoctor ,doctorsLogin};
+module.exports = {hospitalProfilInfo ,updatePassword , emergency , setEmergency , position, doctors , postDoctor ,doctorsLogin ,doctorsLogout};

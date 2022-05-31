@@ -34,7 +34,7 @@ app.use('/logout', require('./routes/api/logoutRoute'));
 
 app.use('/refresh' , require('./routes/api/refreshTokenRoute'));
 
-app.use(verifyJwt);
+// app.use(verifyJwt);
 
 app.use('/admin/dashboard-info',require('./routes/api/infoRoute'));
 app.use('/admin/hospitals', require('./routes/api/hospitalAdminRoute'));

@@ -79,7 +79,6 @@ const addHospital = async (req ,res ,next) => {
     });
 }
 const getAllHospital = async (req ,res ,next) => {
-    
     try {
         const [data,_] = await db.query(sql.hospitals);
         // buid shape of data
