@@ -9,3 +9,4 @@
 2022-5-28 3:59:17 	 77ec4af6-8d5a-4e4d-b6f7-a86b96f3c903 	 SyntaxError	Unexpected token / in JSON at position 34 
 2022-5-28 3:59:29 	 3f9dd6d3-afb1-4235-8b3b-ca727fad5c52 	 SyntaxError	Unexpected token / in JSON at position 34 
 2022-5-28 3:59:43 	 6cace636-e391-421c-8747-5e60c3c7c9b4 	 SyntaxError	Unexpected token / in JSON at position 34 
+2022-5-31 11:15:25 	 e8f4536e-dce2-41f2-ad1d-83cf9689c412 	 TypeError	Cannot read properties of undefined (reading 'designation') 

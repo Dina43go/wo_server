@@ -1,9 +1,9 @@
 const uniqid = require('uniqid');
 const bcrypt =require('bcrypt');
 const utils = require('../utils/utils');
-const db_utils = require('../utils/db');
 
 const {rolesState} = require('../config/roles');
+const sql = require('../config/sql');
 let mailer = require('../config/email');
 
 const Emergency = require('../models/emergency');
@@ -20,10 +20,12 @@ const Gynecho = require('../models/antecedents/gynecho');
 const Medical = require('../models/antecedents/medical');
 const Blood = require('../models/antecedents/blood');
 const Addict = require('../models/antecedents/addict');
+const db = require('../config/db');
 
 
 const hospitalProfilInfo = async (req ,res ,next) => {
     const data = await HospitalProfile.byId(req.params.id);
+    
     if(!utils.empty(data))
         return res.status(200).json(DataShape.hospitalInfo(data));
 
@@ -114,8 +116,44 @@ const position = async (req ,res ,next) => {
         res.sendStatus(200);
     } else return res.status(403).json({err:"un problème est survenu"});
 }
-const doctors = (req ,res) => {
-    res.status(200).json({msg : "doctor"});
+const doctors = async (req ,res) => {
+    // hospital profile
+    const [data , _] = await db.query(sql.doctorHospitalList(req.params.id));
+    res.status(200).json(data);
+}
+
+const doctorsLogin = async (req,res)=> {
+
+    let R = {
+        email: req.body.email,
+        password: req.body.password
+    };
+
+    if(R.email == "" || R.password == "") 
+        return res.status(401).json({err: "les champs sont vides"});
+    
+    let donnees = await Users.checkAuth(R.email);
+
+    if(utils.empty(donnees)) return res.status(403).json({err:"email incorrecte"});
+    
+    let result = await bcrypt.compare(R.password , donnees[0].password)
+    
+    if(result) {
+        try {
+            const data = await Profile.byIdfk(donnees[0].userId);
+            // const assecceTocken= jwt.sign({
+            //     doctor: {
+            //         id: donnees[0].userId,
+            //         group: userGroup[0]
+            //     }
+            // }, process.env.API_ACCESS_TOKEN , {expiresIn: '120s'});
+            
+            // res.status(200).json({token : assecceTocken});
+        } catch (err) {
+            res.status(500).json({err:"problème interne"});
+        }
+
+    } else res.status(403).json({err: "le mot de passe forni est incorrecte"});
 }
 
 const postDoctor = async (req ,res) => {
@@ -182,4 +220,4 @@ const postDoctor = async (req ,res) => {
     }
 }
 
-module.exports = {hospitalProfilInfo ,updatePassword , emergency , setEmergency , position, doctors , postDoctor};
+module.exports = {hospitalProfilInfo ,updatePassword , emergency , setEmergency , position, doctors , postDoctor ,doctorsLogin};

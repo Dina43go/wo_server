@@ -21,7 +21,7 @@ const antecedent =async (req ,res ,next) => {
     if(utils.empty(userfound)) return res.status(403).json({err: "ce identifiant n'existe pas"});
 
     const [data,_] = await db.query(antecedents(req.params.id));
-    res.status(200).send(data);
+    res.status(200).send(DataShape.antecedent(data));
 }
 const setAntecedent = async (req ,res ,next) => {
     let body = req.body;

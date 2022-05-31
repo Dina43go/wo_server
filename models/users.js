@@ -67,13 +67,23 @@ class Users {
         return data;
     };
 
+    static async getToken(token) {
+        const sql = `
+            select * from users
+               
+            where refresh_token = "${token}"
+        `;
+        let [data,_] = await db.query(sql);
+        return data;
+    };
+
     static async setToken(id , token) {
         const sql = `
             UPDATE users
                 set refresh_token= "${token}"
             where userId = "${id}"
         `;
-        let data = db.query(sql);
+        let data = await db.query(sql);
         return data;
     };
 
@@ -83,7 +93,7 @@ class Users {
                 set password= "${hash}"
             where userId = "${id}"
         `;
-        let data = db.query(sql);
+        let data = await db.query(sql);
         return data;
     };
 }

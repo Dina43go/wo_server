@@ -6,7 +6,7 @@ let checkJWT = (req , res , next) =>{
 
     const authorization = req.headers['authorization'];
 
-    console.log(colors.bgGreen(authorization));
+    // console.log(colors.bgGreen(authorization));
 
     if(!authorization) return res.sendStatus(401);
 
@@ -15,8 +15,8 @@ let checkJWT = (req , res , next) =>{
     jwt.verify(token , process.env.API_ACCESS_TOKEN ,(err , decoded) => {
         
         if(err) return res.sendStatus(403);
-
-        req.userid = decoded.userID;
+        req.userid = decoded.user.id;
+        req.group = [decoded.user.group.designation];
         next();
     });
 }

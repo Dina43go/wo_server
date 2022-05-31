@@ -12,8 +12,15 @@ const Position = require('../models/position');
 
 const db = require('../config/db');
 const DataShape = require('../models/shape');
-const info = (req ,res ,next) => {
+const info = async (req ,res ,next) => {
 
+    const [accidents,_] = await db.query(`select count(*) as accident from alerte where type = "accident"`)
+    const [incendie,__] = await db.query(`select count(*) as incendie from alerte where type = "fire"`)
+    const info = [{
+        accidents:  accidents[0].accident,
+        incendie: incendie[0].incendie
+    }];
+    res.status(200).json(info);
 }
 
 const addHospital = async (req ,res ,next) => {

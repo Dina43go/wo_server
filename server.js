@@ -5,6 +5,9 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const verifyJwt = require('./middlewares/verifyJwt');
+
+
 const app = express();
 
 // custom middleware
@@ -22,12 +25,16 @@ app.use(express.json());
 // middlewares for cookies
 app.use(cookieParser());
 
-//Api route
+app.use(express.static(path.join(__dirname,"public")));
 
 // routes
 app.use('/login', require('./routes/api/loginRoute'));
 app.use('/login-single' , require('./routes/api/loginSingleRoute'))
 app.use('/logout', require('./routes/api/logoutRoute'));
+
+app.use('/refresh' , require('./routes/api/refreshTokenRoute'));
+
+app.use(verifyJwt);
 
 app.use('/admin/dashboard-info',require('./routes/api/infoRoute'));
 app.use('/admin/hospitals', require('./routes/api/hospitalAdminRoute'));
@@ -36,8 +43,9 @@ app.use('/hospital/emergency', require('./routes/api/emergencyRoute'));
 app.use('/hospital/position', require('./routes/api/positionRoute'));
 app.use('/hopital/doctors', require('./routes/api/doctorRoute'));
 app.use('/patient', require('./routes/api/patientRoute'));
-
+app.use('/alerte' , require('./routes/api/alerteRoute'));
 app.use('/antecedents', require('./routes/api/antecedentRoute'));
+
 app.all('*' , require('./routes/404').error404);
 
 // error handler

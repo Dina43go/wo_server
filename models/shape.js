@@ -51,6 +51,26 @@ class DataShape {
         }];
     }
 
+    static alerteListe(data) {
+        let embeded = [];
+        for(let index=0 ; index < data.length ; index ++) {
+            embeded.push({
+                alerteId: data[index].alerteId,
+                type: data[index].type,
+                status: data[index].status,
+                lastName: data[index].lastName,
+                firstName2: data[index].firstName,
+                tel: data[index].tel,
+                position: {
+                    lng: data[index].lng,
+                    lat: data[index].lat
+                },
+                createdAt: data[index].createdAt
+            });
+        }
+        return embeded;
+    }
+
     static consultation(data) {
         let embeded=[];
         for(let index=0 ; index < data.length ; index ++) {
@@ -74,6 +94,70 @@ class DataShape {
                 });
         }
         return embeded;
+    }
+
+    static antecedent(data) {
+        const DT = data[0];
+        return [{
+            allergy: {
+                description: DT.al_description == null? "" : DT.al_description,
+                date: DT.al_updateAt
+            },
+            addiction: {
+                data:[
+                    DT.a_alcool,
+                    DT.a_drogues,
+                    DT.a_cigarettes,
+                    DT.a_cafeines
+                ].filter(data=> data != null),
+                date: DT.a_updateAt
+            },
+            antecedent_chirurgico: {
+                description: DT.ch_description == null? "" : DT.ch_description,
+                date: DT.ch_updateAt
+            },
+            antecedent_familial: {
+                data:[
+                    DT.f_asthme,
+                    DT.f_cancer,
+                    DT.f_maladie_cardiovasculaire,
+                    DT.f_diabete,
+                    DT.f_hypertension,
+                    DT.f_epilepsie
+                ].filter(data=> data != null),
+                description: DT.f_description == null? "" : DT.f_description,
+                date: DT.f_updateAt
+            },
+            antecedent_gynecho:{
+                data:DT.g_state,
+                date:DT.g_updateAt
+            },
+            antecedent_medico: {
+                data:[
+                    DT.m_chest_pain,
+                    DT.m_breathing_difficulties,
+                    DT.m_cardiovascular_difficulties,
+                    DT.m_hematological_problem,
+                    DT.m_lymphatic_Problems,
+                    DT.m_gastrointestinal_problem,
+                    DT.m_genital_problem,
+                    DT.m_weight_gain,
+                    DT.m_weightloss,
+                    DT.m_musculoskeletal_disorder,
+                    DT.m_other
+                ].filter(data=> data != null),
+                description: DT.m_description == null? "" : DT.m_description,
+                date: DT.m_updateAt
+            },
+            advanced_health_information:{
+                data:{
+                    bloodGroupe: DT.ad_blood_groupe,
+                    rh:DT.ad_rh,
+                    electrophorese:DT.ad_electrophorese_hemoglobin
+                },
+                date: DT.ad_updateAt
+            }
+        }];
     }
 }
 

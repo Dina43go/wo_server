@@ -14,15 +14,13 @@ const login = async (req ,res) => {
         return res.status(401).json({err: "tous les champs doivent être rempli"});
     
     let donnees = await Users.checkAuth(R.email);
-
-    console.log(donnees[0].password);
+    if(utils.empty(donnees)) return res.status(403).json({err:"email incorrecte"});
     
     let result = await bcrypt.compare(R.password , donnees[0].password)
     
     if(result) {
         try {
             let [userGroup , _] = await db.execute(`select designation , description from usergroup where userGroupId=${donnees[0].userGroupId_fk};`);
-
             // on cree les tokens
 
             const assecceTocken= jwt.sign({
@@ -40,14 +38,13 @@ const login = async (req ,res) => {
             }, process.env.API_REFRESH_TOKEN , {expiresIn: '1d'});
 
             // on insert le refresh token dans la base de donnee
-            let data = await Users.setToken( donnees[0].userId , refreshTocken);
+            await Users.setToken( donnees[0].userId , refreshTocken);
             
-            if(utils.affected(data)){
-                res.cookie('jwt', refreshTocken , {httpOnly: true, maxAge: 24*60*60*1000});
-                res.status(200).json({token : assecceTocken});
-            }
+            res.cookie('jwt', refreshTocken , {httpOnly: true, maxAge: 24*60*60*1000});
+            res.status(200).json({token : assecceTocken});
 
         } catch (err) {
+            console.log(err);
             res.status(500).json({err:"problème interne"});
         }
 

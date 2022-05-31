@@ -1,15 +1,15 @@
 const colors = require('colors')
-exports.checkRoles = (...allowedRoles) => {
+
+checkRoles = (...allowedRoles) => {
+
     return (req ,res ,next) => {
-        if(!req?.roles) return res.sendStatus(401);
+        if(!req?.group) return res.status(401).json({err:"you have note access.."});
         const roles = [...allowedRoles];
 
-        console.log(colors.yellow('roles::') , roles);
-        console.log(colors.yellow('roles::') , res.roles);
-
-        const result = req.roles.map(role=> roles.includes(role)).fin(val=> val == true);
+        const result = req.group.map(role=> roles.includes(role)).find(val=> val == true);
         
-        if(!result) return res.sendStatus(401);
+        if(!result) return res.status(403).json({err:"you have not permission..."});
         next();
-    }
+    };
 }
+module.exports = checkRoles;
