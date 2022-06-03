@@ -2,6 +2,20 @@ const { timeTampsToDate } = require("../utils/utils");
 
 class DataShape {
 
+    static userProfile(data1 , data2) {
+        return {
+            lastName: data1[0].lastName,
+            firstName1: data1[0].firstName1,
+            firstName2: data1[0].firstName2,
+            email: data1[0].email,
+            tel: data1[0].tel,
+            imgPath: data1[0].imgPath,
+            profession: data1[0].profession,
+            qrcodePath: data2[0].qrcodePath
+        }
+    }
+
+
     static hospitals(data) {
         let embeded=[];
         for(let index=0 ; index < data.length ; index ++) {
@@ -22,24 +36,24 @@ class DataShape {
 
     static emergency(data) {
         
-        return [{
+        return {
             driverNumbers: data[0].driverNumbers,
             disponibility: data[0].available
-        }];
+        };
     }
 
     static hospitalInfo(data) {
-        return [{
+        return {
             id: data[0].hopitalProfileId,
             designation: data[0].designation,
             email: data[0].email,
             tel: [data[0].tel_1 , data[0].tel_2],
             adresse: data[0].adresse
-        }];
+        };
     }
 
     static patientInfo(data) {
-        return [{
+        return {
             lastName: data[0].lastName,
             firstName: {
                 1: data[0].firstName1,
@@ -48,7 +62,7 @@ class DataShape {
             age: new Date().getFullYear() - new Date(data[0].birthday).getFullYear(),
             sex: [data[0].sex],
             adresse: data[0].adresse
-        }];
+        };
     }
 
     static alerteListe(data) {
@@ -98,7 +112,7 @@ class DataShape {
 
     static antecedent(data) {
         const DT = data[0];
-        return [{
+        return {
             allergy: {
                 description: DT.al_description == null? "" : DT.al_description,
                 date: DT.al_updateAt
@@ -157,7 +171,7 @@ class DataShape {
                 },
                 date: DT.ad_updateAt
             }
-        }];
+        };
     }
 }
 

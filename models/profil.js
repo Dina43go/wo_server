@@ -4,7 +4,7 @@ class Profile {
     constructor(
         id,lastName,firstName1,firstName2,tel,profession,
         sex,nationality,birthday,adresse,fatherTel,motherTel,
-        userId_fk
+        userId_fk,profile
         ) {
         this.id = id     
         this.lastName = lastName 
@@ -18,6 +18,7 @@ class Profile {
         this.adresse = adresse
         this.fatherTel = fatherTel    //--> can be null
         this.motherTel = motherTel    //--> can be null
+        this.profile = profile
         this.userId_fk = userId_fk
     }
 
@@ -36,6 +37,7 @@ class Profile {
                 firstName2,
                 tel,
                 profession,
+                imgPath,
                 sex,
                 nationality,
                 birthday,
@@ -45,6 +47,7 @@ class Profile {
                 userId_fk,
                 createdAt
             ) values ("${this.id}","${this.lastName}",${firstName1},"${this.firstName2}",${tel},${profession},
+                        "${this.profile}",
                         "${this.sex}","${this.nationality}","${this.birthday}","${this.adresse}",${fatherTel},
                         ${motherTel}, "${this.userId_fk}" , CURRENT_TIMESTAMP())
         `;

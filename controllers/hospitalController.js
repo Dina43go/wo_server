@@ -1,4 +1,6 @@
 const uniqid = require('uniqid');
+const Qrcode = require('qrcode');
+const path = require('path');
 const bcrypt =require('bcrypt');
 const utils = require('../utils/utils');
 
@@ -21,6 +23,7 @@ const Medical = require('../models/antecedents/medical');
 const Blood = require('../models/antecedents/blood');
 const Addict = require('../models/antecedents/addict');
 const db = require('../config/db');
+const QRCODE = require('../models/qrcode');
 
 
 const hospitalProfilInfo = async (req ,res ,next) => {
@@ -195,9 +198,11 @@ const postDoctor = async (req ,res) => {
         const user = new Users(doctor.naissanceId , doctor.email , saltPassword , rolesState.doctor);
         
         const identifiant = uniqid();
+        const qrcodeId = uniqid();
+
         const profile = new Profile(identifiant,doctor.lastName,doctor.firstName1,doctor.firstName2,
                         doctor.tel,doctor.profession, doctor.sex,doctor.nationality,doctor.birthDay,
-                        doctor.adresse,doctor.fatherTel,doctor.motherTel,doctor.naissanceId);
+                        doctor.adresse,doctor.fatherTel,doctor.motherTel,doctor.naissanceId, `/store/doctor${doctor.sex}.png`);
         
         // save data
         user.save();
@@ -224,6 +229,20 @@ const postDoctor = async (req ,res) => {
         Medical.dispose(ids);
         Blood.dispose(ids);
         
+        const pathe = path.join(__dirname , ".." , "public" , "qrcode");
+        const name = doctor.lastName+ "qrcode" +doctor.firstName2 + ".png";
+
+        try {
+            await Qrcode.toFile( pathe+"/"+name , "salut");
+            
+            let qr = new QRCODE(qrcodeId , identifiant , '/qrcode/'+name);
+            qr.save();
+
+        } catch (err) {
+            console.log(err);
+            res.status(500).send({err : "un problème est survenue"});           
+        }
+        
         const text = `
             <h3> Wo service Félicitation Docteur ${doctor.lastName.toUpperCase()} ${doctor.firstName1 !="" ? doctor.firstName1[0].toUpperCase()+"." : "" } ${utils.formatName(doctor.firstName2)} ! votre compte a été crée avec succès </h3>
             votre mot de passe d'authentification est : <strong>${password}</strong>
@@ -238,6 +257,7 @@ const postDoctor = async (req ,res) => {
         });
 
     } catch (err) {
+        console.log(err);
         res.status(500).send({err : "un problème est survenue"});
     }
 }

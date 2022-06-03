@@ -9,7 +9,7 @@ const { empty } = require('../utils/utils');
 exports.handleRefreshToken = async (req ,res , next) => {
     // verifier si le jeton rest présant dans les cookies
     const cookies = req.cookies;
-
+    console.log(cookies);
     if(!cookies?.jwt) return res.sendStatus(401);
     
     //seclectionne un utilisateur qui poccède ce token

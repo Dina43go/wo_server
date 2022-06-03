@@ -9,12 +9,18 @@ const verifyJwt = require('./middlewares/verifyJwt');
 
 
 const app = express();
-
+const http = require('http').createServer(app);
+const io = require("socket.io")(http, {
+    cors: {
+        origin: "*",
+    },
+});
 // custom middleware
 app.use(require('./middlewares/logs').requestLog);
 
 // cores handler
-app.use(cors(require('./config/corsOption')));
+// app.use(cors(require('./config/corsOption')));
+app.use(cors());
 
 /*build middlewares
 *   form url encode data
@@ -34,8 +40,9 @@ app.use('/logout', require('./routes/api/logoutRoute'));
 
 app.use('/refresh' , require('./routes/api/refreshTokenRoute'));
 
-// app.use(verifyJwt);
+app.use(verifyJwt);
 
+app.use('/user/profile',require('./routes/api/userRoute'));
 app.use('/admin/dashboard-info',require('./routes/api/infoRoute'));
 app.use('/admin/hospitals', require('./routes/api/hospitalAdminRoute'));
 app.use('/hospital', require('./routes/api/hospitalRoute'));
@@ -51,5 +58,9 @@ app.all('*' , require('./routes/404').error404);
 // error handler
 app.use(require('./middlewares/errorHandler').erroHandler);
 
+io.on('connection' , (socket)=> {
+    console.log('user connected' , socket.id);
+})
+
 const $_PORT = process.env.API_PORT || 5050;
-app.listen($_PORT , ()=> console.log(`le serveur a démaré sur ${process.env.API_URL}:${$_PORT}`));
+app.listen($_PORT , "0.0.0.0" , ()=> console.log(`le serveur a démaré sur ${process.env.API_URL}:${$_PORT}`));

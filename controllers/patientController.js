@@ -1,4 +1,5 @@
 const uniqid = require('uniqid');
+const Qrcode = require('qrcode');
 const utils = require('../utils/utils');
 const {conformer} = require('../utils/db');
 
@@ -16,8 +17,11 @@ const Medical = require('../models/antecedents/medical');
 const Blood = require('../models/antecedents/blood');
 const Addict = require('../models/antecedents/addict');
 const db = require('../config/db');
+const QRCODE = require('../models/qrcode');
+const path = require('path');
 
 const newPatient = async (req ,res ,next) => {
+
     const personne = req.body;
 
     if(personne.lastName =="" || personne.firstName2 =="" || personne.naissanceId =="")
@@ -32,9 +36,10 @@ const newPatient = async (req ,res ,next) => {
         const user = new Users(personne.naissanceId , personne.email , "" , rolesState.user);
         
         const identifiant = uniqid();
+        const qrcodeId = uniqid();
         const profile = new Profile(identifiant,personne.lastName,personne.firstName1,personne.firstName2,
                         personne.tel,personne.profession, personne.sex,personne.nationality,personne.birthDay,
-                        personne.adresse,personne.fatherTel,personne.motherTel,personne.naissanceId);
+                        personne.adresse,personne.fatherTel,personne.motherTel,personne.naissanceId , `/store/patient${personne.sex}.png`);
         
         // save data
         user.save();
@@ -61,8 +66,22 @@ const newPatient = async (req ,res ,next) => {
         Gynecho.dispose(ids);
         Medical.dispose(ids);
         Blood.dispose(ids);
+
+        // qrcode
+        const pathe = path.join(__dirname , ".." , "public" , "qrcode");
+        const name = personne.lastName+ "qrcode" +personne.firstName2 + ".png";
         
-        res.status(200).json({msg: "données enregistrées"});
+        try {
+            await Qrcode.toFile( pathe+"/"+name , "salut");
+            
+            let qr = new QRCODE(qrcodeId , identifiant , '/qrcode/'+name);
+            qr.save();
+            res.status(200).json({msg: "données enregistrées"});
+
+        } catch (err) {
+            console.log(err);
+            res.status(500).send({err : "un problème est survenue"});           
+        }
 
     } catch (err) {
         console.log(err);
