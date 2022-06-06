@@ -8,7 +8,7 @@ const { extractObject } = require('../utils/db');
 
 const logout = async (req ,res ,next) => {
     const cookies = req.cookies;
-    
+    console.log(cookies);
     if(cookies?.doctorNumber)
         res.clearCookie('doctorNumber',{httpOnly: true});
 

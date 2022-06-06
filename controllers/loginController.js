@@ -37,7 +37,7 @@ const login = async (req ,res) => {
             const assecceTocken= jwt.sign({
                 user: {
                     id: donnees[0].userId,
-                    profileId: profile.profileId,
+                    profileId: profile.hopitalProfileId,
                     group: userGroup[0].designation
                 }
             }, process.env.API_ACCESS_TOKEN , {expiresIn: '60s'});
@@ -45,7 +45,7 @@ const login = async (req ,res) => {
             const refreshTocken= jwt.sign({
                 user: {
                     id: donnees[0].userId,
-                    profileId: profile.profileId,
+                    profileId: profile.hopitalProfileId,
                     group: userGroup[0].designation
                 }
             }, process.env.API_REFRESH_TOKEN , {expiresIn: '1d'});
@@ -53,12 +53,13 @@ const login = async (req ,res) => {
             // on insert le refresh token dans la base de donnee
             await Users.setToken( donnees[0].userId , refreshTocken);
             
-            res.cookie('jwt', refreshTocken , {httpOnly: true, maxAge: 24*60*60*1000});
+            res.cookie('jwt', refreshTocken , {httpOnly: true, sameSite:'None' , secure:'true' , maxAge: 24*60*60*1000});
             if(pros){
-                res.cookie('doctorNumber',[],{httpOnly: true, maxAge: 24*60*60*1000});
+                res.cookie('doctorNumber',[],{httpOnly: true, sameSite:'None' , secure:'true', maxAge: 24*60*60*1000});
             }
-                
-            res.status(200).json({token : assecceTocken});
+            
+            console.log(profile.hopitalProfileId);
+            res.status(200).json({token : assecceTocken , designation:  profile.designation,});
 
         } catch (err) {
             console.log(err);
@@ -101,7 +102,7 @@ const loginSingle = async (req,res)=> {
         let data = await Users.setToken( donnees[0].userId , refreshTocken);
                 
         if(utils.affected(data)){
-            res.cookie('jwt', refreshTocken , {httpOnly: true, maxAge: 24*60*60*1000});
+            res.cookie('jwt', refreshTocken , {httpOnly: true, sameSite:'None' , maxAge: 24*60*60*1000});
             res.status(200).json({token : assecceTocken});
         }
     } else res.status(403).json({err: "mauvais identifiant"});

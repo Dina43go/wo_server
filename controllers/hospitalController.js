@@ -27,8 +27,10 @@ const QRCODE = require('../models/qrcode');
 
 
 const hospitalProfilInfo = async (req ,res ,next) => {
-    const data = await HospitalProfile.byId(req.params.id);
-    // console.log(req.cookies.doctorNumber);
+
+    // we d'ont neen req params
+
+    const data = await HospitalProfile.byId(req.userid);
     if(!utils.empty(data))
         return res.status(200).json({
             doctorNumber: req.cookies.doctorNumber,
@@ -40,17 +42,20 @@ const hospitalProfilInfo = async (req ,res ,next) => {
 
 const updatePassword = async (req ,res ,next) => {
     const body = req.body;
-    if(body.id =="" || body.oldPasseword=="" || body.newPasseword =="")
-        return res.status(401).json({err:"certaines informations sont manquantes"});
+    console.log(req.body);
+    if(Object.keys(body).length === 0)
+        return res.status(401).json({err:"veillez remplir tous les champs"});
+    if(body.oldPasseword=="" || body.newPasseword =="")
+        return res.status(401).json({err:"veillez remplir tous les champs"});
 
-    const userInfo = await Users.byId(body.id);
+    const userInfo = await Users.byId(req.userid);
     if(utils.empty(userInfo)) return res.status(403).json({err:"ce identifiant n'existe pas"});
 
     const match = await bcrypt.compare(body.oldPasseword , userInfo[0].password);
     if(match){
         try {
             const hash = await bcrypt.hash(body.newPasseword , 10);
-            Users.setPassword(body.id , hash);
+            Users.setPassword(req.userid , hash);
 
             const text = `
                 <h3> Wo service Félicitation ! votre mot de passe a été changé avec succès </h3>
@@ -73,8 +78,10 @@ const updatePassword = async (req ,res ,next) => {
 }
 
 const emergency = async (req ,res ,next) => {
+    console.log(req.userId);
+    console.log(req.profileId);
     try {
-        let data = await Emergency.byId(req.params.id);
+        let data = await Emergency.byId(req.profileId);
         if(!utils.empty(data))
             return res.status(200).json(DataShape.emergency(data));
 
@@ -87,21 +94,26 @@ const emergency = async (req ,res ,next) => {
 
 const setEmergency = async (req , res) => {
     const corps = req.body;
-    if(corps.id === "" || corps.setname === "")
+    if(corps.setname === "")
         return res.status(401).json({err: "veillez fournir les bonnes informations"});
 
+    console.log(corps);
     try {
 
         if (req.body.setname === "disponibility") {
             if(typeof corps.data !== "boolean") return res.status(403).json({err: "mauvaise donnée"})
-            Emergency.setAvailable(corps.id , corps.data);
+            Emergency.setAvailable(req.profileId , corps.data);
+            if(corps.data) 
+                res.status(200).json({msg:"votre centre êtes actuelement disponible"});
+            else
+                res.status(200).json({msg:"votre centre êtes actuelement indisponible"});
         }
 
         if(req.body.setname === "driverNumber") {
-            if(typeof corps.data !== "number") return res.status(403).json({err: "mauvaise donnée"})
-            Emergency.setDirverNumber(corps.id , corps.data);
+            if(typeof corps.data != "string") return res.status(403).json({err: "mauvaise donnée"})
+            Emergency.setDirverNumber(req.profileId , corps.data);
+            res.status(200).json({msg: "vous disposé maintenant de $$ ambulance"});
         }
-        res.sendStatus(200);
     } catch (err) {
         console.log(err);
         res.status(500).json({err: "un problème est survenu"});
@@ -110,26 +122,27 @@ const setEmergency = async (req , res) => {
 
 const position = async (req ,res ,next) => {
     const body = req.body;
-    if(body.id ==="" || body.position == undefined)
+    if(body.position.lng == "" || body.position.lat == "")
         return res.status(401).json({err:"donnée manquante"});
     
     if (typeof body.position.lng !== "number" || typeof body.position.lat !== "number")
         return res.status(403).json({err:"les données de géolocalistion ne sont pas conforme"});
 
-    const result = await Position.setHopitalPosition(body.id , body.position);
+    const result = await Position.setHopitalPosition(req.profileId , body.position);
 
     if(utils.affected_(result)){
-        res.sendStatus(200);
-    } else return res.status(403).json({err:"un problème est survenu"});
+        res.status(200).json({msg: "les données de géolocalisation viennent d'être ajusté"});
+    } else return res.status(403).json({err:"vos données géographiques non pas pu être mis à jour"});
 }
+
 const doctors = async (req ,res) => {
     // hospital profile
-    const [data , _] = await db.query(sql.doctorHospitalList(req.params.id));
+    const [data , _] = await db.query(sql.doctorHospitalList(req.profileId));
     res.status(200).json(data);
 }
 
 const doctorsLogin = async (req,res)=> {
-
+    console.log(req.body);
     let R = {
         email: req.body.email,
         password: req.body.password
@@ -150,8 +163,9 @@ const doctorsLogin = async (req,res)=> {
             // req.doctorNumber++;
             const doctor = {
                 id: data[0].profileId,
+                imgPath: data[0].imgPath,
                 lastName: data[0].lastName,
-                lastName: {
+                firstName: {
                     1:data[0].firstName1,
                     2:data[0].firstName2,
                 },
@@ -184,8 +198,9 @@ const doctorsLogout = async (req, res) =>{
 const postDoctor = async (req ,res) => {
 
     const doctor = req.body;
+    console.log(doctor);
     if(doctor.lastName =="" || doctor.firstName2 =="" || doctor.profession =="" || doctor.naissanceId =="" || doctor.email == "" || doctor.tel == "")
-        return res.status(401).json({err: "veiller remplir tous les champs"});
+        return res.status(401).json({err: "veillez remplir les champs recommendés"});
 
     const userfound = await Users.byEmail(doctor.email);
 
@@ -251,7 +266,7 @@ const postDoctor = async (req ,res) => {
         mailer.transporter.sendMail(mailer.mailOption(doctor.email , text) , (err , info)=> {
             if(err){
                 console.log(err);
-                return res.status(500).json({err:"un problème est survenue veillez réessayer plus tard"});
+                return res.status(500).json({err:"un problème est survenue l'or de l'envoide de mail"});
             } else
                 return res.status(200).json({msg: "données enregistrées"});
         });

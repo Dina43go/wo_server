@@ -25,7 +25,7 @@ const newPatient = async (req ,res ,next) => {
     const personne = req.body;
 
     if(personne.lastName =="" || personne.firstName2 =="" || personne.naissanceId =="")
-        return res.status(401).json({err: "veiller remplir tous les champs"});
+        return res.status(401).json({err: "veillez remplir indiqué"});
     
     const userfound = await Users.byEmail(personne.email);
 
@@ -140,7 +140,7 @@ const addConsultation = async (req ,res ,next) => {
             status,
             createdAt
         ) values (
-            "${id}","${body.hopital_profile_id}","${body.doctorId}","${req.params.id}",${body.numberOrder},
+            "${id}","${req.profileId}","${body.doctorId}","${req.params.id}",${body.numberOrder},
             "${body.hopitalDesignation}","${body.doctorName}","${body.constantes.weigth}","${body.constantes.pulse}","${body.constantes.temps}","${body.constantes.TA}",
             "${body.dominantComplainte}","${body.orderSigne}",${P[0]},${P[1]},
             "${format(body.drugsDosage)}","${body.evolution}","${body.status}",CURRENT_TIMESTAMP()

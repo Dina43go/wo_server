@@ -59,8 +59,9 @@ class DataShape {
                 1: data[0].firstName1,
                 2: data[0].firstName2
             },
+            imgPath: data[0].imgPath,
             age: new Date().getFullYear() - new Date(data[0].birthday).getFullYear(),
-            sex: [data[0].sex],
+            sex: data[0].sex,
             adresse: data[0].adresse
         };
     }

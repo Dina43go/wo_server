@@ -10,3 +10,10 @@
 2022-5-28 3:59:29 	 3f9dd6d3-afb1-4235-8b3b-ca727fad5c52 	 SyntaxError	Unexpected token / in JSON at position 34 
 2022-5-28 3:59:43 	 6cace636-e391-421c-8747-5e60c3c7c9b4 	 SyntaxError	Unexpected token / in JSON at position 34 
 2022-5-31 11:15:25 	 e8f4536e-dce2-41f2-ad1d-83cf9689c412 	 TypeError	Cannot read properties of undefined (reading 'designation') 
+2022-6-4 10:28:55 	 e9562e51-a95e-480c-a794-0f9d5263badc 	 Error	Not allowed by cors 
+2022-6-4 10:29:54 	 b553829f-dae5-49f7-9baa-9fc21a124d91 	 Error	Not allowed by cors 
+2022-6-4 10:51:5 	 338615ec-0bbb-406f-974a-2a2f53d348f4 	 TypeError	res.headers is not a function 
+2022-6-4 10:56:47 	 875551c7-2e7f-4111-a17c-62ff94608459 	 TypeError	res.headers is not a function 
+2022-6-4 10:59:44 	 89b68dd9-ff46-4f2f-9bce-4a35bf7c18be 	 TypeError	res.headers is not a function 
+2022-6-4 11:16:33 	 9584c380-9a34-462b-92b0-c63725b4486e 	 Error	Not allowed by cors 
+2022-6-4 11:17:14 	 3e590873-6ce3-4c74-a4f0-e0abf99409de 	 Error	Not allowed by cors 

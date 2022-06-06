@@ -5,6 +5,7 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const credentials = require('./middlewares/credential');
 const verifyJwt = require('./middlewares/verifyJwt');
 
 
@@ -18,9 +19,12 @@ const io = require("socket.io")(http, {
 // custom middleware
 app.use(require('./middlewares/logs').requestLog);
 
+// credential
+app.use(credentials);
+
 // cores handler
-// app.use(cors(require('./config/corsOption')));
-app.use(cors());
+app.use(cors(require('./config/corsOption')));
+// app.use(cors());
 
 /*build middlewares
 *   form url encode data

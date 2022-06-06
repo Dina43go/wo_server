@@ -77,7 +77,7 @@ const alerte = (min , max)=> {
 const doctorHospitalList = (id)=> {
     return `
         select distinct doctorId,
-        P.lastName,P.firstName1,P.firstName2,P.tel,U.mail
+        P.lastName,P.firstName1,P.firstName2, P.imgPath , P.profession ,P.tel,U.mail
                     
         from consultation C
         inner join profiles P
@@ -91,7 +91,7 @@ const doctorHospitalList = (id)=> {
 // const doctorHospitalList = (id)=> {
 //     return `
 //         select distinct doctorId,
-//         P.lastName,P.firstName1,P.firstName2,P.tel,U.mail
+//         P.lastName,P.firstName1,P.firstName2 , P.imgPath ,P.tel,U.mail
                     
 //         from consultation C
 //         inner join profiles P
