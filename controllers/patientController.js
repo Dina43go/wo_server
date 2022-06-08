@@ -93,6 +93,9 @@ const patient = async (req ,res ,next) => {
     
     try {
         const data = await Profile.byIdfk(req.params.id);
+
+        if(utils.empty(data))
+            return res.status(403).json({err:"ce indentifiant n'existe pas"});
         if(!utils.empty(data))
             return res.status(200).json(DataShape.patientInfo(data));
         
@@ -114,6 +117,10 @@ const addConsultation = async (req ,res ,next) => {
     // get req params
     const body = req.body;
     const id= uniqid();
+
+    if(body.doctorId == ""||body.hopitalDesignation == "" ||
+        body.doctorName == ""||body.dominantComplainte == "")
+            return res.status(401).json({err: 'veillez remplir les champs indiqués'});
 
     const P = conformer(["ref","traitement"] , body.pricing)
     const sql = `

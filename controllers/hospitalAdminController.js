@@ -37,7 +37,7 @@ const addHospital = async (req ,res ,next) => {
     };
 
     if(hopital.email == "" || hopital.designation == "" || hopital.tel1 == "" || hopital.adresse == "") 
-        return res.status(401).json({msg: "les champs ne doivent pas être vide"});
+        return res.status(401).json({err: "les champs ne doivent pas être vide"});
       
     const userfound = await Users.byEmail(hopital.email);
 
@@ -52,31 +52,34 @@ const addHospital = async (req ,res ,next) => {
 
     try {
         const saltPassword = await bcrypt.hash(password , 10);
-        
-        // create new user and profil
-        const user = new Users(ID , hopital.email , saltPassword , rolesState.hopital);
-        
-        const buildId = uniqid(); // build profile id
-        const profile = new HospitalProfile(buildId, hopital.designation, hopital.email , hopital.tel1 , hopital.tel2 , hopital.adresse , ID);
-        
-        // save data into database
-        user.save();
-        profile.save();
-        
-        //init emergency data              Hopital_profil  1---1 Emergency
-        Emergency.init(buildId);
 
+        mailer.transporter.sendMail(mailer.mailOption(hopital.email , text) , (err , info)=> {
+            if(err) {
+                return res.status(500).json({err:"un problème est survenue veillez réessayer plus tard"});
+            }else {
+
+                // create new user and profil
+                const user = new Users(ID , hopital.email , saltPassword , rolesState.hopital);
+                
+                const buildId = uniqid(); // build profile id
+                const profile = new HospitalProfile(buildId, hopital.designation, hopital.email , hopital.tel1 , hopital.tel2 , hopital.adresse , ID);
+                
+                // save data into database
+                user.save();
+                profile.save();
+                
+                //init emergency data              Hopital_profil  1---1 Emergency
+                Emergency.init(buildId);
+
+                return res.status(200).json({msg: "données enregistrées"});
+            }
+                
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({err: "un truc s'est passé veillez réessayer plus tard"});
     }
 
-    mailer.transporter.sendMail(mailer.mailOption(hopital.email , text) , (err , info)=> {
-        if(err) 
-            return res.status(500).json({err:"un problème est survenue veillez réessayer plus tard"});
-        else
-            return res.status(200).json({msg: "données enregistrées"});
-    });
 }
 const getAllHospital = async (req ,res ,next) => {
     try {

@@ -24,7 +24,7 @@ class DataShape {
                 designation: data[index].designation,
                 email: data[index].email,
                 tel: [data[index].tel_1,data[index].tel_2],
-                position: {lng: data[index].lng , lat: data[index].lat},
+                position: {lng: parseFloat(data[index].lng) , lat: parseFloat(data[index].lat)},
                 emergency: {
                     driverNumbers: data[index].driverNumbers,
                     disponibility: data[index].available? true: false,
@@ -74,7 +74,7 @@ class DataShape {
                 type: data[index].type,
                 status: data[index].status,
                 lastName: data[index].lastName,
-                firstName2: data[index].firstName,
+                firstName2: data[index].firstName2,
                 tel: data[index].tel,
                 position: {
                     lng: data[index].lng,
@@ -116,7 +116,7 @@ class DataShape {
         return {
             allergy: {
                 description: DT.al_description == null? "" : DT.al_description,
-                date: DT.al_updateAt
+                // date: DT.al_updateAt
             },
             addiction: {
                 data:[
@@ -125,11 +125,11 @@ class DataShape {
                     DT.a_cigarettes,
                     DT.a_cafeines
                 ].filter(data=> data != null),
-                date: DT.a_updateAt
+                // date: DT.a_updateAt
             },
             antecedent_chirurgico: {
                 description: DT.ch_description == null? "" : DT.ch_description,
-                date: DT.ch_updateAt
+                // date: DT.ch_updateAt
             },
             antecedent_familial: {
                 data:[
@@ -141,11 +141,11 @@ class DataShape {
                     DT.f_epilepsie
                 ].filter(data=> data != null),
                 description: DT.f_description == null? "" : DT.f_description,
-                date: DT.f_updateAt
+                // date: DT.f_updateAt
             },
             antecedent_gynecho:{
                 data:DT.g_state,
-                date:DT.g_updateAt
+                // date:DT.g_updateAt
             },
             antecedent_medico: {
                 data:[
@@ -162,7 +162,7 @@ class DataShape {
                     DT.m_other
                 ].filter(data=> data != null),
                 description: DT.m_description == null? "" : DT.m_description,
-                date: DT.m_updateAt
+                // date: DT.m_updateAt
             },
             advanced_health_information:{
                 data:{
@@ -170,7 +170,7 @@ class DataShape {
                     rh:DT.ad_rh,
                     electrophorese:DT.ad_electrophorese_hemoglobin
                 },
-                date: DT.ad_updateAt
+                // date: DT.ad_updateAt
             }
         };
     }

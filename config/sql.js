@@ -70,6 +70,7 @@ const alerte = (min , max)=> {
     on P.userId_fk = A.profile_fk
     inner join positions Po
     on A.alerteId = Po.refererId
+    order by Po.createdAt desc
     limit ${min},${max};
 `;
 }
@@ -88,18 +89,5 @@ const doctorHospitalList = (id)=> {
     `;
 }
 
-// const doctorHospitalList = (id)=> {
-//     return `
-//         select distinct doctorId,
-//         P.lastName,P.firstName1,P.firstName2 , P.imgPath ,P.tel,U.mail
-                    
-//         from consultation C
-//         inner join profiles P
-//         on C.doctorId = P.userId_fk
-//         inner join users U
-//         on C.doctorId = U.userId
-//         where C.hopital_profile_fk = "${id}"
-//     `;
-// }
 
 module.exports= {hospitals , antecedents , alerte , doctorHospitalList};

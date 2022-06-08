@@ -8,6 +8,9 @@ const cookieParser = require('cookie-parser');
 const credentials = require('./middlewares/credential');
 const verifyJwt = require('./middlewares/verifyJwt');
 
+const uniqid= require('uniqid');
+const db = require('./config/db');
+
 
 const app = express();
 const http = require('http').createServer(app);
@@ -62,9 +65,56 @@ app.all('*' , require('./routes/404').error404);
 // error handler
 app.use(require('./middlewares/errorHandler').erroHandler);
 
+io.use((socket, next) => {
+    let userId = socket.handshake.auth.userId;
+    if (!userId) {
+        userId = socket.handshake.headers.userid;
+        if(!userId){
+            return next(new Error("invalid userId"));
+        }
+    }
+    console.log(userId);
+    socket.userId = userId;
+    next();
+  });
+
 io.on('connection' , (socket)=> {
-    console.log('user connected' , socket.id);
+    console.log('user connected' , socket.userId , socket.id);
+
+    socket.on('message', data=> console.log(data));
+    //all user
+    const users = [];
+    for (let [id, socket] of io.of("/").sockets) {
+      users.push({
+        userId: socket.userId
+      });
+    }
+    socket.emit("users", users);
+
+    // // new user
+    socket.broadcast.emit("user connected", {
+        userId: socket.userId
+    });
+
+    console.log(users.length);
+    socket.on('alerte', async  (data) => {
+        console.log(data);
+        // génerer un id alerte // alerteid ,type , referer id 
+                                // id for position alerteid
+        const alerteId = uniqid();
+        const positionId = uniqid();
+        // let sql1 = `insert into alerte(alerteId , type , profile_fk) values('${alerteId}' , '${data.type}' , '${data.profile}');`;
+        // let sql2 = `insert into positions (PositionId , lng , lat , refererId) values('${positionId}',${data.position.lng},${data.position.lat},'${alerteId}')`;
+
+        await db.query(sql1);
+        await db.query(sql2);
+        socket.broadcast.emit('alerte' , data);
+    });
+
+    socket.on("disconnect", () => {
+        socket.broadcast.emit("user disconnected", socket.userId);
+    });
 })
 
 const $_PORT = process.env.API_PORT || 5050;
-app.listen($_PORT , "0.0.0.0" , ()=> console.log(`le serveur a démaré sur ${process.env.API_URL}:${$_PORT}`));
+http.listen($_PORT , "0.0.0.0" , ()=> console.log(`le serveur a démaré sur ${process.env.API_URL}:${$_PORT}`));

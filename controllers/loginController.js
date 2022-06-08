@@ -102,7 +102,7 @@ const loginSingle = async (req,res)=> {
         let data = await Users.setToken( donnees[0].userId , refreshTocken);
                 
         if(utils.affected(data)){
-            res.cookie('jwt', refreshTocken , {httpOnly: true, sameSite:'None' , maxAge: 24*60*60*1000});
+            res.cookie('jwt', refreshTocken , {httpOnly: true, sameSite:'None' , secure:'true' , maxAge: 24*60*60*1000});
             res.status(200).json({token : assecceTocken});
         }
     } else res.status(403).json({err: "mauvais identifiant"});

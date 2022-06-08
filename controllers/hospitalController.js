@@ -210,67 +210,69 @@ const postDoctor = async (req ,res) => {
     const password = uniqid().toUpperCase().slice(5);
     try {
         const saltPassword = await bcrypt.hash(password , 10);
-        const user = new Users(doctor.naissanceId , doctor.email , saltPassword , rolesState.doctor);
-        
-        const identifiant = uniqid();
-        const qrcodeId = uniqid();
 
-        const profile = new Profile(identifiant,doctor.lastName,doctor.firstName1,doctor.firstName2,
-                        doctor.tel,doctor.profession, doctor.sex,doctor.nationality,doctor.birthDay,
-                        doctor.adresse,doctor.fatherTel,doctor.motherTel,doctor.naissanceId, `/store/doctor${doctor.sex}.png`);
-        
-        // save data
-        user.save();
-        profile.save();
-
-        // handle init of antecedents
-
-        const ids = {
-            allergy_fk: uniqid(),
-            chirurgico_fk: uniqid(),
-            familial_fk: uniqid(),
-            gynecho_fk: uniqid(),
-            medico_fk: uniqid(),
-            addiction_fk: uniqid(),
-            advanced_health_fk:uniqid()
-        }
-        Profile.initAntecedents(identifiant ,ids);
-        // dispose all antecedents table datas
-        Allergy.dispose(ids);
-        Addict.dispose(ids);
-        Chirurgical.dispose(ids);
-        Familial.dispose(ids)
-        Gynecho.dispose(ids)
-        Medical.dispose(ids);
-        Blood.dispose(ids);
-        
-        const pathe = path.join(__dirname , ".." , "public" , "qrcode");
-        const name = doctor.lastName+ "qrcode" +doctor.firstName2 + ".png";
-
-        try {
-            await Qrcode.toFile( pathe+"/"+name , "salut");
-            
-            let qr = new QRCODE(qrcodeId , identifiant , '/qrcode/'+name);
-            qr.save();
-
-        } catch (err) {
-            console.log(err);
-            res.status(500).send({err : "un problème est survenue"});           
-        }
-        
         const text = `
             <h3> Wo service Félicitation Docteur ${doctor.lastName.toUpperCase()} ${doctor.firstName1 !="" ? doctor.firstName1[0].toUpperCase()+"." : "" } ${utils.formatName(doctor.firstName2)} ! votre compte a été crée avec succès </h3>
             votre mot de passe d'authentification est : <strong>${password}</strong>
             <p>vous pouvez toute fois le changer plus tard </p>
         `;
-        mailer.transporter.sendMail(mailer.mailOption(doctor.email , text) , (err , info)=> {
+        mailer.transporter.sendMail(mailer.mailOption(doctor.email , text) , async (err , info)=> {
             if(err){
                 console.log(err);
-                return res.status(500).json({err:"un problème est survenue l'or de l'envoide de mail"});
-            } else
-                return res.status(200).json({msg: "données enregistrées"});
+                return res.status(500).json({err:"un problème est survenue l'or de l'envoide de mail veillez réessayer plus tard"});
+            } else {
+                const user = new Users(doctor.naissanceId , doctor.email , saltPassword , rolesState.doctor);
+                
+                const identifiant = uniqid();
+                const qrcodeId = uniqid();
+
+                const profile = new Profile(identifiant,doctor.lastName,doctor.firstName1,doctor.firstName2,
+                                doctor.tel,doctor.profession, doctor.sex,doctor.nationality,doctor.birthDay,
+                                doctor.adresse,doctor.fatherTel,doctor.motherTel,doctor.naissanceId, `/store/doctor${doctor.sex}.png`);
+                
+                // save data
+                user.save();
+                profile.save();
+
+                // handle init of antecedents
+
+                const ids = {
+                    allergy_fk: uniqid(),
+                    chirurgico_fk: uniqid(),
+                    familial_fk: uniqid(),
+                    gynecho_fk: uniqid(),
+                    medico_fk: uniqid(),
+                    addiction_fk: uniqid(),
+                    advanced_health_fk:uniqid()
+                }
+                Profile.initAntecedents(identifiant ,ids);
+                // dispose all antecedents table datas
+                Allergy.dispose(ids);
+                Addict.dispose(ids);
+                Chirurgical.dispose(ids);
+                Familial.dispose(ids)
+                Gynecho.dispose(ids)
+                Medical.dispose(ids);
+                Blood.dispose(ids);
+                
+                const pathe = path.join(__dirname , ".." , "public" , "qrcode");
+                const name = doctor.lastName+ "qrcode" +doctor.firstName2 + ".png";
+
+                try {
+                    await Qrcode.toFile( pathe+"/"+name , "salut");
+                    
+                    let qr = new QRCODE(qrcodeId , identifiant , '/qrcode/'+name);
+                    qr.save();
+                    return res.status(200).json({msg: "données enregistrées"});
+
+                } catch (err) {
+                    console.log(err);
+                    res.status(500).send({err : "un problème est survenue"});           
+                }
+            }
         });
 
+        
     } catch (err) {
         console.log(err);
         res.status(500).send({err : "un problème est survenue"});
