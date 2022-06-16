@@ -85,6 +85,16 @@ class Profile {
         const [data,_] = await db.query(sql);
         return data;
     }
+
+    static async byQRcode(profile_fk) {
+        const sql = `select
+            P.profileId,	P.lastName , P.firstName1 ,P.firstName2 , P.imgPath , P.birthday ,P.sex, P.adresse
+            from profiles as P
+            inner join qr_code as Q
+        where P.profileId = "${profile_fk}" and Q.profileId_fk = "${profile_fk}"`;
+        const [data,_] = await db.query(sql);
+        return data;
+    }
 }
 
 module.exports = Profile;

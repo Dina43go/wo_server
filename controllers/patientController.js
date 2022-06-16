@@ -72,7 +72,7 @@ const newPatient = async (req ,res ,next) => {
         const name = personne.lastName+ "qrcode" +personne.firstName2 + ".png";
         
         try {
-            await Qrcode.toFile( pathe+"/"+name , "salut");
+            await Qrcode.toFile( pathe+"/"+name , qrcodeId);
             
             let qr = new QRCODE(qrcodeId , identifiant , '/qrcode/'+name);
             qr.save();
@@ -92,14 +92,18 @@ const newPatient = async (req ,res ,next) => {
 const patient = async (req ,res ,next) => {
     
     try {
-        const data = await Profile.byIdfk(req.params.id);
+        let data = await Profile.byIdfk(req.params.id);
 
-        if(utils.empty(data))
-            return res.status(403).json({err:"ce indentifiant n'existe pas"});
+        if(utils.empty(data)) {
+            data = await Profile.byQRcode(req.params.id);
+            
+            if(utils.empty(data)) 
+                return res.status(403).json({err:"ce indentifiant n'est pas valide"});
+        }
+
         if(!utils.empty(data))
             return res.status(200).json(DataShape.patientInfo(data));
-        
-        res.status(200).json(data);
+            
     } catch (err) {
         console.log(err);
         res.status(500).json({err:"un problème est survenu"});

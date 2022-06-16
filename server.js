@@ -81,7 +81,8 @@ io.use((socket, next) => {
 io.on('connection' , (socket)=> {
     console.log('user connected' , socket.userId , socket.id);
 
-    socket.on('message', data=> console.log(data));
+    socket.join(socket.userId);
+    console.log(socket.rooms);
     //all user
     const users = [];
     for (let [id, socket] of io.of("/").sockets) {
@@ -101,15 +102,25 @@ io.on('connection' , (socket)=> {
         console.log(data);
         // génerer un id alerte // alerteid ,type , referer id 
                                 // id for position alerteid
-        const alerteId = uniqid();
-        const positionId = uniqid();
+        // const alerteId = uniqid();
+        // const positionId = uniqid();
         // let sql1 = `insert into alerte(alerteId , type , profile_fk) values('${alerteId}' , '${data.type}' , '${data.profile}');`;
         // let sql2 = `insert into positions (PositionId , lng , lat , refererId) values('${positionId}',${data.position.lng},${data.position.lat},'${alerteId}')`;
 
-        await db.query(sql1);
-        await db.query(sql2);
+        // await db.query(sql1);
+        // await db.query(sql2);
         socket.broadcast.emit('alerte' , data);
     });
+
+    socket.on("to hospital" , data=>{
+        console.log("on ##" , data);
+        socket.to(data.to).emit("get alerte" , data.data);
+    });
+
+    socket.on("hospital response" , data=> {
+        console.log(data);
+        socket.to(data.to).emit("hospital response back" , data.message);
+    })
 
     socket.on("disconnect", () => {
         socket.broadcast.emit("user disconnected", socket.userId);

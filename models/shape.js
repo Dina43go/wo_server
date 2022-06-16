@@ -111,6 +111,30 @@ class DataShape {
         return embeded;
     }
 
+    static userconsultation(data) {
+        let embeded=[];
+        for(let index=0 ; index < data.length ; index ++) {
+            embeded.push({
+                    hopitalDesignation: data[index].hospital_designation,
+                    doctorName: data[index].doctorName,
+                    numberOrder: data[index].numberOrder,
+                    constantes: [data[index].weigth , data[index].temp , data[index].pulse , data[index].TA],
+                    traitement: [data[index].dominant_complainte , data[index].order_signe],
+
+                    // pricing:[data[index].pricing_ref,data[index].pricing_trait].filter(data=> data != null),
+                    pricing: {
+                        traitement: data[index].pricing_trait =! null ? true : false,
+                        ref: data[index].pricing_ref =! null ? true : false,
+                    },
+                    drugsDosage: data[index].drugs_dosages.split("£-£p"),
+                    evolution: data[index].evolution,
+                    status: data[index].status,
+                    date: timeTampsToDate(data[index].createdAt)
+                });
+        }
+        return embeded;
+    }
+
     static antecedent(data) {
         const DT = data[0];
         return {

@@ -12,4 +12,10 @@ const userInfo = async (req ,res) => {
     res.status(200).json(DataShape.userProfile(data,data2));
 }
 
-module.exports = {userInfo};
+const userCarnet = async(req , res)=> {
+    const sql = `select * from consultation where patientId="${req.userid}"`;
+    const [data ,_] = await db.query(sql);
+    res.status(200).json(DataShape.userconsultation(data));
+}
+
+module.exports = {userInfo , userCarnet};
