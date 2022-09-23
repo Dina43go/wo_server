@@ -95,10 +95,25 @@ const patient = async (req ,res ,next) => {
         let data = await Profile.byIdfk(req.params.id);
 
         if(utils.empty(data)) {
-            data = await Profile.byQRcode(req.params.id);
-            
-            if(utils.empty(data)) 
+            console.log("code qr ID ::", req.params.id);
+
+            let sql = `select profileId_fk from qr_code where id = "${req.params.id}"`;
+            let [responsedb, _] = await db.query(sql);
+
+            console.log('profile id ::' , responsedb[0].profileId_fk);
+
+            data = await Profile.byId(responsedb[0].profileId_fk);
+            console.log(data);
+            if(utils.empty(data)) {
                 return res.status(403).json({err:"ce indentifiant n'est pas valide"});
+            }
+            else {
+                data = await Profile.byId(responsedb[0].profileId_fk);
+                return res.status(200).json({
+                    id: data[0].userId_fk,
+                    data: DataShape.patientInfo(data)
+                });
+            }
         }
 
         if(!utils.empty(data))

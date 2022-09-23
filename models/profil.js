@@ -86,6 +86,12 @@ class Profile {
         return data;
     }
 
+    static async byId(id){
+        const sql = `select * from profiles where profileId="${id}"`;
+        const [data,_] = await db.query(sql);
+        return data;
+    }
+
     static async byQRcode(profile_fk) {
         const sql = `select
             P.profileId,	P.lastName , P.firstName1 ,P.firstName2 , P.imgPath , P.birthday ,P.sex, P.adresse

@@ -55,6 +55,7 @@ const addHospital = async (req ,res ,next) => {
 
         mailer.transporter.sendMail(mailer.mailOption(hopital.email , text) , (err , info)=> {
             if(err) {
+                log(err)
                 return res.status(500).json({err:"un problème est survenue veillez réessayer plus tard"});
             }else {
 

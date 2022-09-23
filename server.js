@@ -100,15 +100,15 @@ io.on('connection' , (socket)=> {
     console.log(users.length);
     socket.on('alerte', async  (data) => {
         console.log(data);
-        // génerer un id alerte // alerteid ,type , referer id 
-                                // id for position alerteid
-        // const alerteId = uniqid();
-        // const positionId = uniqid();
-        // let sql1 = `insert into alerte(alerteId , type , profile_fk) values('${alerteId}' , '${data.type}' , '${data.profile}');`;
-        // let sql2 = `insert into positions (PositionId , lng , lat , refererId) values('${positionId}',${data.position.lng},${data.position.lat},'${alerteId}')`;
+        //génerer un id alerte // alerteid ,type , referer id 
+                               // id for position alerteid
+        const alerteId = uniqid();
+        const positionId = uniqid();
+        let sql1 = `insert into alerte(alerteId , type , profile_fk) values('${alerteId}' , '${data.type}' , '${data.profile}');`;
+        let sql2 = `insert into positions (PositionId , lng , lat , refererId) values('${positionId}',${data.position.lng},${data.position.lat},'${alerteId}')`;
 
-        // await db.query(sql1);
-        // await db.query(sql2);
+        await db.query(sql1);
+        await db.query(sql2);
         socket.broadcast.emit('alerte' , data);
     });
 
